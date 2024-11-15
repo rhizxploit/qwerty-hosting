@@ -52,7 +52,7 @@ sudo apt update && sudo apt upgrade -y
 
 # Periksa dan instal dependensi dasar
 echo "2. Memeriksa dependensi dasar..."
-DEPENDENCIES=(software-properties-common curl apt-transport-https ca-certificates unzip git nginx ufw)
+DEPENDENCIES=(software-properties-common curl apt-transport-https ca-certificates unzip git nginx)
 for PACKAGE in "${DEPENDENCIES[@]}"; do
     check_package_installed "$PACKAGE"
 done
@@ -140,28 +140,8 @@ check_nginx_config
 # Restart Nginx untuk menerapkan perubahan
 sudo systemctl restart nginx
 
-# Membuka port di UFW
-echo "7. Menyiapkan Firewall (UFW)..."
-sudo ufw allow OpenSSH
-sudo ufw allow 'Nginx HTTP'
-sudo ufw allow 'Nginx HTTPS'
-sudo ufw enable
-
-# Menambahkan SSL dengan Certbot
-echo "8. Memasang SSL dengan Certbot..."
-# Memeriksa dan menginstal Certbot
-check_package_installed "certbot"
-check_package_installed "python3-certbot-nginx"
-
-# Mengaktifkan HTTPS dengan Certbot
-sudo certbot --nginx -d "$DOMAIN" --non-interactive --agree-tos --email admin@$DOMAIN
-
-# Menjadwalkan pembaruan SSL otomatis
-echo "9. Menjadwalkan pembaruan SSL otomatis..."
-echo "0 12 * * * certbot renew --quiet" | sudo tee -a /etc/crontab > /dev/null
-
 # Membuat akun admin pertama kali untuk login
-echo "10. Membuat akun admin pertama kali untuk login ke Pterodactyl Panel..."
+echo "7. Membuat akun admin pertama kali untuk login ke Pterodactyl Panel..."
 read -p "Masukkan email admin: " ADMIN_EMAIL
 read -p "Masukkan username admin: " ADMIN_USERNAME
 read -s -p "Masukkan password admin: " ADMIN_PASSWORD
@@ -174,5 +154,5 @@ php artisan p:user:make --email="$ADMIN_EMAIL" --username="$ADMIN_USERNAME" --pa
 # Selesai
 echo "=========================="
 echo "Instalasi dan Pengecekan Pterodactyl selesai!"
-echo "Akses panel di https://$DOMAIN"
+echo "Akses panel di http://$DOMAIN"
 echo "=========================="
