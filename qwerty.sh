@@ -11,7 +11,7 @@ check_service_status() {
     SERVICE=$1
     if ! systemctl is-active --quiet "$SERVICE"; then
         echo "Layanan $SERVICE tidak berjalan. Memulai ulang layanan..."
-        sudo systemctl restart "$SERVICE" || { echo "Gagal memulai layanan $SERVICE."; exit 1; }
+        sudo systemctl restart "$SERVICE"
     else
         echo "Layanan $SERVICE berjalan dengan baik."
     fi
@@ -22,7 +22,7 @@ check_package_installed() {
     PACKAGE=$1
     if ! dpkg -l | grep -q "$PACKAGE"; then
         echo "Paket $PACKAGE tidak ditemukan. Menginstal $PACKAGE..."
-        sudo apt install -y "$PACKAGE" || { echo "Gagal menginstal paket $PACKAGE."; exit 1; }
+        sudo apt install -y "$PACKAGE"
     else
         echo "Paket $PACKAGE sudah terinstal."
     fi
@@ -32,7 +32,7 @@ check_package_installed() {
 check_nginx_config() {
     if ! sudo nginx -t; then
         echo "Konfigurasi Nginx error. Memperbaiki konfigurasi..."
-        sudo systemctl reload nginx || { echo "Gagal me-reload Nginx."; exit 1; }
+        sudo systemctl reload nginx
     else
         echo "Konfigurasi Nginx valid."
     fi
@@ -48,7 +48,7 @@ fi
 
 # Update dan upgrade sistem
 echo "1. Update dan upgrade sistem..."
-sudo apt update && sudo apt upgrade -y || { echo "Gagal memperbarui sistem."; exit 1; }
+sudo apt update && sudo apt upgrade -y
 
 # Periksa dan instal dependensi dasar
 echo "2. Memeriksa dependensi dasar..."
@@ -83,21 +83,22 @@ fi
 echo "5. Memeriksa instalasi Pterodactyl Panel..."
 if [[ ! -d "/var/www/pterodactyl" ]]; then
     echo "Pterodactyl Panel belum terinstal. Menginstal panel..."
-    sudo mkdir -p /var/www/pterodactyl || { echo "Gagal membuat direktori Pterodactyl."; exit 1; }
-    sudo chown -R "$USER:$USER" /var/www/pterodactyl
-    cd /var/www/pterodactyl
-    curl -Lo panel.tar.gz https://github.com/pterodactyl/panel/releases/latest/download/panel.tar.gz || { echo "Gagal mengunduh panel."; exit 1; }
-    tar -xzvf panel.tar.gz || { echo "Gagal mengekstrak panel."; exit 1; }
+    cd /var/www
+    sudo mkdir -p pterodactyl
+    sudo chown -R $USER:$USER pterodactyl
+    cd pterodactyl
+    curl -Lo panel.tar.gz https://github.com/pterodactyl/panel/releases/latest/download/panel.tar.gz
+    tar -xzvf panel.tar.gz
     chmod -R 755 storage/* bootstrap/cache/
 
     echo "Menginstal dependensi PHP untuk panel..."
-    composer install --no-dev --optimize-autoloader || { echo "Gagal menginstal dependensi PHP."; exit 1; }
+    composer install --no-dev --optimize-autoloader
 
     echo "Mengonfigurasi panel..."
     cp .env.example .env
     php artisan key:generate --force
     php artisan migrate --seed --force
-    sudo chown -R www-data:www-data /var/www/pterodactyl
+    chown -R www-data:www-data /var/www/pterodactyl
 else
     echo "Pterodactyl Panel sudah terinstal."
 fi
@@ -131,15 +132,13 @@ server {
 }
 EOF
     sudo ln -s /etc/nginx/sites-available/pterodactyl.conf /etc/nginx/sites-enabled/
-else
-    echo "File konfigurasi Nginx sudah ada."
 fi
 
 # Periksa validitas konfigurasi Nginx
 check_nginx_config
 
 # Restart Nginx untuk menerapkan perubahan
-sudo systemctl restart nginx || { echo "Gagal merestart Nginx."; exit 1; }
+sudo systemctl restart nginx
 
 # Membuat akun admin pertama kali untuk login
 echo "7. Membuat akun admin pertama kali untuk login ke Pterodactyl Panel..."
@@ -150,7 +149,7 @@ echo
 
 # Menjalankan perintah untuk membuat akun admin
 cd /var/www/pterodactyl
-php artisan p:user:make --email="$ADMIN_EMAIL" --username="$ADMIN_USERNAME" --password="$ADMIN_PASSWORD" --admin || { echo "Gagal membuat akun admin."; exit 1; }
+php artisan p:user:make --email="$ADMIN_EMAIL" --username="$ADMIN_USERNAME" --password="$ADMIN_PASSWORD" --admin
 
 # Selesai
 echo "=========================="
