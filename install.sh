@@ -21,16 +21,16 @@ set -e
 #   You should have received a copy of the GNU General Public License                #
 #   along with this program.  If not, see <https://www.gnu.org/licenses/>.           #
 #                                                                                    #
-# https://github.com/pterodactyl-installer/pterodactyl-installer/blob/master/LICENSE #
+# https://github.com/rhizxploit/qwerty-hosting/blob/master/LICENSE                   #
 #                                                                                    #
 # This script is not associated with the official Pterodactyl Project.               #
-# https://github.com/pterodactyl-installer/pterodactyl-installer                     #
+# https://github.com/rhizxploit/qwerty-hosting                                       #
 #                                                                                    #
 ######################################################################################
 
 GITHUB_SOURCE="v1.1.1"
 SCRIPT_RELEASE="v1.1.1"
-export GITHUB_BASE_URL="https://raw.githubusercontent.com/pterodactyl-installer/pterodactyl-installer"
+export GITHUB_BASE_URL="https://raw.githubusercontent.com/rhizxploit/qwerty-hosting"
 
 LOG_PATH="/var/log/pterodactyl-installer.log"
 
