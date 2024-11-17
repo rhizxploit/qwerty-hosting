@@ -70,7 +70,7 @@ enable_services() {
 }
 
 dep_install() {
-  output "Installing dependencies for $OS $OS_VER..."
+  output "Qwerty-Hosting : Installing dependencies for $OS $OS_VER..."
 
   [ "$CONFIGURE_FIREWALL" == true ] && install_firewall && firewall_ports
 
@@ -108,7 +108,7 @@ dep_install() {
 
   enable_services
 
-  success "Dependencies installed!"
+  success "Qwerty-Hosting : Dependencies installed!"
 }
 
 ptdl_dl() {
@@ -119,21 +119,21 @@ ptdl_dl() {
 
   chmod u+x /usr/local/bin/wings
 
-  success "Pterodactyl Wings downloaded successfully"
+  success "Qwerty-Hosting : Pterodactyl Wings downloaded successfully"
 }
 
 systemd_file() {
-  output "Installing systemd service.."
+  output "Qwerty-Hosting : Installing systemd service.."
 
   curl -o /etc/systemd/system/wings.service "$GITHUB_URL"/configs/wings.service
   systemctl daemon-reload
   systemctl enable wings
 
-  success "Installed systemd service!"
+  success "Qwerty-Hosting : Installed systemd service!"
 }
 
 firewall_ports() {
-  output "Opening port 22 (SSH), 8080 (Wings Port), 2022 (Wings SFTP Port)"
+  output "Qwerty-Hosting : Opening port 22 (SSH), 8080 (Wings Port), 2022 (Wings SFTP Port)"
 
   [ "$CONFIGURE_LETSENCRYPT" == true ] && firewall_allow_ports "80 443"
   [ "$CONFIGURE_DB_FIREWALL" == true ] && firewall_allow_ports "3306"
@@ -145,13 +145,13 @@ firewall_ports() {
   firewall_allow_ports "2022"
   output "Allowed port 2022"
 
-  success "Firewall ports opened!"
+  success "Qwerty-Hosting : Firewall ports opened!"
 }
 
 letsencrypt() {
   FAILED=false
 
-  output "Configuring LetsEncrypt.."
+  output "Qwerty-Hosting : Configuring LetsEncrypt.."
 
   # If user has nginx
   systemctl stop nginx || true
@@ -165,12 +165,12 @@ letsencrypt() {
   if [ ! -d "/etc/letsencrypt/live/$FQDN/" ] || [ "$FAILED" == true ]; then
     warning "The process of obtaining a Let's Encrypt certificate failed!"
   else
-    success "The process of obtaining a Let's Encrypt certificate succeeded!"
+    success "Qwerty-Hosting : The process of obtaining a Let's Encrypt certificate succeeded!"
   fi
 }
 
 configure_mysql() {
-  output "Configuring MySQL.."
+  output "Qwerty-Hosting : Configuring MySQL.."
 
   create_db_user "$MYSQL_DBHOST_USER" "$MYSQL_DBHOST_PASSWORD" "$MYSQL_DBHOST_HOST"
   grant_all_privileges "*" "$MYSQL_DBHOST_USER" "$MYSQL_DBHOST_HOST"
@@ -190,13 +190,13 @@ configure_mysql() {
     systemctl restart mysqld
   fi
 
-  success "MySQL configured!"
+  success "Qwerty-Hosting : MySQL configured!"
 }
 
 # --------------- Main functions --------------- #
 
 perform_install() {
-  output "Installing pterodactyl wings.."
+  output "Qwerty-Hosting : Installing pterodactyl wings.."
   dep_install
   ptdl_dl
   systemd_file
