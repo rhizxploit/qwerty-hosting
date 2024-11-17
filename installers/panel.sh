@@ -4,7 +4,7 @@ set -e
 
 ######################################################################################
 #                                                                                    #
-# Project 'pterodactyl-installer'                                                    #
+# Project 'qwerty-installer'                                                         #
 #                                                                                    #
 # Copyright (C) 2018 - 2024, Vilhelm Prytz, <vilhelm@prytznet.se>                    #
 #                                                                                    #
@@ -21,10 +21,10 @@ set -e
 #   You should have received a copy of the GNU General Public License                #
 #   along with this program.  If not, see <https://www.gnu.org/licenses/>.           #
 #                                                                                    #
-# https://github.com/pterodactyl-installer/pterodactyl-installer/blob/master/LICENSE #
+# https://github.com/rhizxploit/qwerty-hosting/blob/master/LICENSE                   #
 #                                                                                    #
 # This script is not associated with the official Pterodactyl Project.               #
-# https://github.com/pterodactyl-installer/pterodactyl-installer                     #
+# https://github.com/rhizxploit/qwerty-hosting                                       #
 #                                                                                    #
 ######################################################################################
 
@@ -65,45 +65,45 @@ user_lastname="${user_lastname:-}"
 user_password="${user_password:-}"
 
 if [[ -z "${email}" ]]; then
-  error "Email is required"
+  error "Qwerty-Hosting : Email is required"
   exit 1
 fi
 
 if [[ -z "${user_email}" ]]; then
-  error "User email is required"
+  error "Qwerty-Hosting : User email is required"
   exit 1
 fi
 
 if [[ -z "${user_username}" ]]; then
-  error "User username is required"
+  error "Qwerty-Hosting : User username is required"
   exit 1
 fi
 
 if [[ -z "${user_firstname}" ]]; then
-  error "User firstname is required"
+  error "Qwerty-Hosting : User firstname is required"
   exit 1
 fi
 
 if [[ -z "${user_lastname}" ]]; then
-  error "User lastname is required"
+  error "Qwerty-Hosting : User lastname is required"
   exit 1
 fi
 
 if [[ -z "${user_password}" ]]; then
-  error "User password is required"
+  error "Qwerty-Hosting : User password is required"
   exit 1
 fi
 
 # --------- Main installation functions -------- #
 
 install_composer() {
-  output "Installing composer.."
+  output "Qwerty-Hosting : Installing composer.."
   curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
-  success "Composer installed!"
+  success "Qwerty-Hosting : Composer installed!"
 }
 
 ptdl_dl() {
-  output "Downloading pterodactyl panel files .. "
+  output "Qwerty-Hosting : Downloading pterodactyl panel files .. "
   mkdir -p /var/www/pterodactyl
   cd /var/www/pterodactyl || exit
 
@@ -113,11 +113,11 @@ ptdl_dl() {
 
   cp .env.example .env
 
-  success "Downloaded pterodactyl panel files!"
+  success "Qwerty-Hosting : Downloaded pterodactyl panel files!"
 }
 
 install_composer_deps() {
-  output "Installing composer dependencies.."
+  output "Qwerty-Hosting : Installing composer dependencies.."
   [ "$OS" == "rocky" ] || [ "$OS" == "almalinux" ] && export PATH=/usr/local/bin:$PATH
   COMPOSER_ALLOW_SUPERUSER=1 composer install --no-dev --optimize-autoloader
   success "Installed composer dependencies!"
@@ -125,7 +125,7 @@ install_composer_deps() {
 
 # Configure environment
 configure() {
-  output "Configuring environment.."
+  output "Qwerty-Hosting : Configuring environment.."
 
   local app_url="http://$FQDN"
   [ "$ASSUME_SSL" == true ] && app_url="https://$FQDN"
@@ -167,7 +167,7 @@ configure() {
     --password="$user_password" \
     --admin=1
 
-  success "Configured environment!"
+  success "Qwerty-Hosting : Configured environment!"
 }
 
 # set the correct folder permissions depending on OS and webserver
@@ -184,18 +184,18 @@ set_folder_permissions() {
 }
 
 insert_cronjob() {
-  output "Installing cronjob.. "
+  output "Qwerty-Hosting : Installing cronjob.. "
 
   crontab -l | {
     cat
     output "* * * * php /var/www/pterodactyl/artisan schedule:run >> /dev/null 2>&1"
   } | crontab -
 
-  success "Cronjob installed!"
+  success "Qwerty-Hosting : Cronjob installed!"
 }
 
 install_pteroq() {
-  output "Installing pteroq service.."
+  output "Qwerty-Hosting : Installing pteroq service.."
 
   curl -o /etc/systemd/system/pteroq.service "$GITHUB_URL"/configs/pteroq.service
 
@@ -211,7 +211,7 @@ install_pteroq() {
   systemctl enable pteroq.service
   systemctl start pteroq
 
-  success "Installed pteroq!"
+  success "Qwerty-Hosting : Installed pteroq!"
 }
 
 # -------- OS specific install functions ------- #
@@ -276,7 +276,7 @@ alma_rocky_dep() {
 }
 
 dep_install() {
-  output "Installing dependencies for $OS $OS_VER..."
+  output "Qwerty-Hosting : Installing dependencies for $OS $OS_VER..."
 
   # Update repos before installing
   update_repos
@@ -324,7 +324,7 @@ dep_install() {
 
   enable_services
 
-  success "Dependencies installed!"
+  success "Qwerty-Hosting : Dependencies installed!"
 }
 
 # --------------- Other functions -------------- #
@@ -334,13 +334,13 @@ firewall_ports() {
 
   firewall_allow_ports "22 80 443"
 
-  success "Firewall ports opened!"
+  success "Qwerty-Hosting : Firewall ports opened!"
 }
 
 letsencrypt() {
   FAILED=false
 
-  output "Configuring Let's Encrypt..."
+  output "Qwerty-Hosting : Configuring Let's Encrypt..."
 
   # Obtain certificate
   certbot --nginx --redirect --no-eff-email --email "$email" -d "$FQDN" || FAILED=true
@@ -360,14 +360,14 @@ letsencrypt() {
       CONFIGURE_LETSENCRYPT=false
     fi
   else
-    success "The process of obtaining a Let's Encrypt certificate succeeded!"
+    success "Qwerty-Hosting : The process of obtaining a Let's Encrypt certificate succeeded!"
   fi
 }
 
 # ------ Webserver configuration functions ----- #
 
 configure_nginx() {
-  output "Configuring nginx .."
+  output "Qwerty-Hosting : Configuring nginx .."
 
   if [ "$ASSUME_SSL" == true ] && [ "$CONFIGURE_LETSENCRYPT" == false ]; then
     DL_FILE="nginx_ssl.conf"
@@ -406,13 +406,13 @@ configure_nginx() {
     systemctl restart nginx
   fi
 
-  success "Nginx configured!"
+  success "Qwerty-Hosting : Nginx configured!"
 }
 
 # --------------- Main functions --------------- #
 
 perform_install() {
-  output "Starting installation.. this might take a while!"
+  output "Qwerty-Hosting : Starting installation.. this might take a while!"
   dep_install
   install_composer
   ptdl_dl
